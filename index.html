@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Mango Sorting System</title>
+  <style>
+    :root {
+      --green: #1f8f4d;
+      --green-dark: #0d4d2d;
+      --yellow: #f4c542;
+      --yellow-soft: #fff4c2;
+      --black: #111111;
+      --white: #ffffff;
+      --gray: #f4f6f3;
+      --text-muted: #5f665f;
+      --border: #dfe7dd;
+      --shadow: 0 20px 60px rgba(17, 17, 17, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(17, 17, 17, 0.04);
+    }
+
+    .nav-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 220px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(17, 17, 17, 0.08);
+      background: #08131b;
+      box-shadow: 0 12px 28px rgba(17, 17, 17, 0.14);
+      flex: 0 0 auto;
+      animation: logoFloat 6s ease-in-out infinite;
+    }
+
+    .brand-logo {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .brand-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .brand-copy strong {
+      font-size: 0.98rem;
+      line-height: 1.08;
+    }
+
+    .brand-copy small {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover {
+      color: var(--green);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 11px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      background: var(--green);
+      color: var(--white);
+      box-shadow: 0 12px 24px rgba(31, 143, 77, 0.22);
+    }
+
+    .button-primary:hover {
+      background: var(--green-dark);
+    }
+
+    .button-secondary {
+      background: var(--yellow);
+      color: var(--black);
+      box-shadow: 0 12px 24px rgba(244, 197, 66, 0.2);
+    }
+
+    .button-outline {
+      background: var(--white);
+      border-color: var(--border);
+      color: var(--black);
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 76px);
+      display: grid;
+      align-items: center;
+      background:
+        linear-gradient(90deg, rgba(17, 17, 17, 0.88), rgba(17, 17, 17, 0.64)),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 58px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 58px),
+        var(--black);
+      color: var(--white);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--green), var(--yellow), var(--green));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -12%;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 120px 120px;
+      opacity: 0.7;
+      transform: rotate(4deg);
+      animation: heroGridFloat 18s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.88fr);
+      gap: 56px;
+      align-items: center;
+      padding: 82px 0 96px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--yellow);
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      animation: riseIn 0.7s ease both;
+    }
+
+    .signal-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(31, 143, 77, 0.16);
+      animation: signalPulse 2.8s ease-out infinite;
+    }
+
+    .hero h1 {
+      max-width: 720px;
+      margin-top: 22px;
+      font-size: clamp(2.65rem, 6vw, 5.6rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+      animation: riseIn 0.8s ease both 0.08s;
+    }
+
+    .hero-copy {
+      max-width: 640px;
+      margin-top: 24px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      animation: riseIn 0.9s ease both 0.18s;
+    }
+
+    .hero-cta {
+      margin-top: 34px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      animation: riseIn 0.95s ease both 0.28s;
+    }
+
+    .hero-stats {
+      margin-top: 42px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      max-width: 620px;
+      animation: riseIn 1s ease both 0.38s;
+    }
+
+    .stat {
+      border-left: 3px solid var(--yellow);
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 0 8px 8px 0;
+      animation: floatStat 6s ease-in-out infinite;
+    }
+
+    .stat:nth-child(2) {
+      animation-delay: 0.8s;
+    }
+
+    .stat:nth-child(3) {
+      animation-delay: 1.6s;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.28rem;
+      color: var(--white);
+    }
+
+    .stat span {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.88rem;
+    }
+
+    .machine-preview {
+      min-height: 480px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      display: grid;
+      align-content: center;
+      gap: 22px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      animation: riseIn 1s ease both 0.45s;
+    }
+
+    .machine-preview::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: linear-gradient(135deg, rgba(244, 197, 66, 0.14), transparent 32%, rgba(31, 143, 77, 0.18) 66%, transparent 100%);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+      animation: panelSheen 10s linear infinite;
+      pointer-events: none;
+    }
+
+    .preview-screen {
+      aspect-ratio: 4 / 3;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #132119;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+      color: rgba(255, 255, 255, 0.86);
+      font-weight: 800;
+      text-align: center;
+      padding: 0;
+    }
+
+    .preview-screen::before {
+      content: "";
+      position: absolute;
+      background:
+        linear-gradient(180deg, rgba(10, 15, 12, 0.06), rgba(10, 15, 12, 0.4)),
+        radial-gradient(circle at 78% 22%, rgba(244, 197, 66, 0.16), transparent 24%),
+        radial-gradient(circle at 18% 82%, rgba(31, 143, 77, 0.22), transparent 28%);
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .preview-screen::after {
+      content: "";
+      position: absolute;
+      inset: -10% 38% -10% -20%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.24), transparent);
+      transform: translateX(-100%) skewX(-14deg);
+      animation: screenSweep 7s linear infinite;
+      z-index: 2;
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .preview-machine-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      filter: saturate(1.04) contrast(1.02);
+      transform-origin: center center;
+      animation: machineDrift 11s ease-in-out infinite;
+    }
+
+    .scan-grid {
+      position: absolute;
+      inset: 8% 6% 10%;
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.14;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 84%);
+      animation: gridGlow 8s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    .preview-focus {
+      position: absolute;
+      inset: 23% 34% 28% 31%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      box-shadow:
+        0 0 0 1px rgba(31, 143, 77, 0.28),
+        0 0 0 16px rgba(31, 143, 77, 0.08);
+      background: linear-gradient(180deg, rgba(244, 197, 66, 0.08), rgba(31, 143, 77, 0.04));
+      z-index: 3;
+      animation: focusPulse 4.6s ease-in-out infinite;
+    }
+
+    .preview-focus::before,
+    .preview-focus::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: rgba(255, 255, 255, 0.82);
+      border-style: solid;
+    }
+
+    .preview-focus::before {
+      top: 10px;
+      left: 10px;
+      border-width: 2px 0 0 2px;
+    }
+
+    .preview-focus::after {
+      right: 10px;
+      bottom: 10px;
+      border-width: 0 2px 2px 0;
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      top: 18%;
+      height: 3px;
+      background: var(--white);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.88);
+      animation: scanSweep 3.4s ease-in-out infinite;
+      z-index: 4;
+    }
+
+    .status-tag {
+      position: absolute;
+      z-index: 5;
+      border-radius: 8px;
+      background: rgba(17, 17, 17, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 10px 12px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+    }
+
+    .status-tag-left {
+      top: 18px;
+      left: 18px;
+      animation: floatCard 5.8s ease-in-out infinite;
+    }
+
+    .status-tag-right {
+      top: 88px;
+      right: 18px;
+      animation: floatCard 6.4s ease-in-out infinite reverse;
+    }
+
+    .preview-logo-card {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      z-index: 5;
+      width: min(30%, 138px);
+      border-radius: 8px;
+      background: rgba(6, 13, 18, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
+      padding: 6px;
+      animation: logoFloat 7s ease-in-out infinite;
+      backdrop-filter: blur(10px);
+    }
+
+    .preview-logo-card img {
+      width: 100%;
+      display: block;
+      border-radius: 6px;
+    }
+
+    .preview-logo-card span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .preview-label {
+      position: absolute;
+      z-index: 5;
+      left: 20px;
+      bottom: 18px;
+      border-radius: 8px;
+      background: rgba(17, 17, 17, 0.74);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 10px 12px;
+      font-size: 0.86rem;
+    }
+
+    .preview-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+
+    .metric:hover {
+      transform: translateY(-2px);
+      border-color: rgba(244, 197, 66, 0.34);
+    }
+
+    .metric::after {
+      content: "";
+      position: absolute;
+      left: -100%;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+      animation: metricSweep 3.6s linear infinite;
+    }
+
+    .metric:nth-child(2)::after {
+      animation-delay: 0.8s;
+    }
+
+    .metric:nth-child(3)::after {
+      animation-delay: 1.6s;
+    }
+
+    .metric span {
+      display: block;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 0.78rem;
+    }
+
+    .metric strong {
+      color: var(--yellow);
+      font-size: 1rem;
+    }
+
+    section {
+      padding: 84px 0;
+    }
+
+    .section-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .section-heading {
+      max-width: 760px;
+      margin-bottom: 42px;
+    }
+
+    .section-label {
+      color: var(--green);
+      font-size: 0.84rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      margin-top: 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .section-heading p {
+      margin-top: 16px;
+      color: var(--text-muted);
+      font-size: 1.04rem;
+    }
+
+    .features {
+      background: var(--gray);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      min-height: 230px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(17, 17, 17, 0.08);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--yellow-soft);
+      color: var(--black);
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+
+    .feature-card h3 {
+      margin-top: 22px;
+      font-size: 1.08rem;
+      line-height: 1.25;
+    }
+
+    .feature-card p {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .demo {
+      background: var(--white);
+    }
+
+    .demo-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
+      gap: 40px;
+      align-items: stretch;
+    }
+
+    .demo-placeholder {
+      min-height: 440px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(31, 143, 77, 0.08), rgba(244, 197, 66, 0.1)),
+        var(--gray);
+      display: block;
+      padding: 28px;
+      text-align: left;
+      overflow: hidden;
+      box-shadow: 0 20px 48px rgba(17, 17, 17, 0.08);
+    }
+
+    .demo-placeholder h3 {
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
+      line-height: 1.05;
+      max-width: 520px;
+    }
+
+    .demo-placeholder p {
+      margin-top: 14px;
+      color: var(--text-muted);
+      max-width: 460px;
+    }
+
+    .demo-gallery-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+      grid-template-rows: repeat(2, 190px);
+      gap: 16px;
+    }
+
+    .demo-shot {
+      position: relative;
+      min-height: 190px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(17, 17, 17, 0.08);
+      background:
+        linear-gradient(160deg, rgba(9, 20, 24, 0.96), rgba(16, 37, 33, 0.92) 58%, rgba(31, 143, 77, 0.72)),
+        var(--black);
+      box-shadow: 0 18px 36px rgba(17, 17, 17, 0.12);
+      isolation: isolate;
+    }
+
+    .demo-shot::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+      transform: translateX(-100%);
+      animation: screenSweep 7s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.8;
+    }
+
+    .demo-shot-main {
+      grid-row: span 2;
+      min-height: 396px;
+    }
+
+    .demo-shot img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transform: scale(1.01);
+      transition: opacity 320ms ease, transform 420ms ease, filter 320ms ease;
+    }
+
+    .demo-shot.is-loaded img {
+      opacity: 1;
+    }
+
+    .demo-shot.is-loaded:hover img {
+      transform: scale(1.04);
+    }
+
+    .demo-shot.is-loaded .demo-shot-fallback {
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+    }
+
+    .demo-shot-caption {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 2;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(17, 17, 17, 0.34), rgba(17, 17, 17, 0.82));
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 12px 14px;
+      backdrop-filter: blur(10px);
+      color: var(--white);
+    }
+
+    .demo-shot-caption strong {
+      display: block;
+      font-size: 0.95rem;
+      line-height: 1.1;
+    }
+
+    .demo-shot-caption span {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.8rem;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .demo-shot-fallback {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      align-content: start;
+      gap: 6px;
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(17, 17, 17, 0.1), rgba(17, 17, 17, 0.78)),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 12px, rgba(255, 255, 255, 0.02) 12px 24px),
+        linear-gradient(140deg, rgba(31, 143, 77, 0.44), rgba(244, 197, 66, 0.2));
+      color: var(--white);
+      transition: opacity 260ms ease, transform 260ms ease;
+    }
+
+    .demo-shot-fallback span {
+      color: var(--yellow);
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .demo-shot-fallback strong {
+      font-size: 1.24rem;
+      line-height: 1.05;
+      max-width: 260px;
+    }
+
+    .demo-shot-fallback p {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.84rem;
+      max-width: 300px;
+    }
+
+    .demo-gallery-note {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .demo-gallery-note span {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--white);
+      padding: 8px 12px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .demo-copy-block {
+      margin-top: 24px;
+    }
+
+    .workflow {
+      display: grid;
+      gap: 14px;
+    }
+
+    .workflow-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+      background: var(--white);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .workflow-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px rgba(17, 17, 17, 0.08);
+    }
+
+    .workflow-number {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background: var(--black);
+      color: var(--yellow);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .workflow-item h3 {
+      font-size: 1.05rem;
+      line-height: 1.25;
+    }
+
+    .workflow-item p {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 0.94rem;
+    }
+
+    .scalable {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .scalable .section-label {
+      color: var(--yellow);
+    }
+
+    .scalable .section-heading p {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .scale-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .scale-panel {
+      min-height: 250px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      padding: 26px;
+      background: rgba(255, 255, 255, 0.06);
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .scale-panel:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(244, 197, 66, 0.28);
+    }
+
+    .scale-panel strong {
+      display: block;
+      color: var(--yellow);
+      font-size: 2.1rem;
+      line-height: 1;
+    }
+
+    .scale-panel h3 {
+      margin-top: 22px;
+      font-size: 1.22rem;
+    }
+
+    .scale-panel p {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .contact {
+      background: var(--gray);
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(340px, 1fr);
+      gap: 44px;
+      align-items: start;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .contact-row {
+      border-bottom: 1px solid var(--border);
+      padding: 0 0 16px;
+    }
+
+    .contact-row span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .contact-row a,
+    .contact-row strong {
+      display: inline-block;
+      margin-top: 4px;
+      color: var(--black);
+      font-size: 1.08rem;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .form-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 26px;
+      box-shadow: 0 16px 42px rgba(17, 17, 17, 0.08);
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+
+    .form-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 52px rgba(17, 17, 17, 0.1);
+    }
+
+    .form-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 13px;
+      font: inherit;
+      color: var(--black);
+      background: var(--white);
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(31, 143, 77, 0.12);
+    }
+
+    textarea {
+      min-height: 118px;
+      resize: vertical;
+    }
+
+    .form-note {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
+
+    .footer {
+      padding: 28px 0;
+      background: var(--black);
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .footer-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer a:hover {
+      color: var(--yellow);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px) scale(0.98);
+      transition: opacity 720ms ease, transform 720ms ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(28px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes heroGridFloat {
+      from {
+        transform: rotate(4deg) translate3d(-20px, -14px, 0) scale(1);
+      }
+      to {
+        transform: rotate(2deg) translate3d(18px, 12px, 0) scale(1.04);
+      }
+    }
+
+    @keyframes signalPulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(31, 143, 77, 0.36);
+      }
+      60% {
+        box-shadow: 0 0 0 10px rgba(31, 143, 77, 0);
+      }
+    }
+
+    @keyframes floatStat {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    @keyframes logoFloat {
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+      50% {
+        transform: translateY(-8px) scale(1.02);
+      }
+    }
+
+    @keyframes floatCard {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes panelSheen {
+      0% {
+        transform: translateX(-10%) rotate(0deg);
+      }
+      100% {
+        transform: translateX(10%) rotate(6deg);
+      }
+    }
+
+    @keyframes gridGlow {
+      0%,
+      100% {
+        opacity: 0.12;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.24;
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes machineDrift {
+      0%,
+      100% {
+        transform: scale(1) translate3d(0, 0, 0);
+      }
+      50% {
+        transform: scale(1.03) translate3d(0, -6px, 0);
+      }
+    }
+
+    @keyframes focusPulse {
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow:
+          0 0 0 1px rgba(31, 143, 77, 0.28),
+          0 0 0 16px rgba(31, 143, 77, 0.08);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow:
+          0 0 0 1px rgba(244, 197, 66, 0.4),
+          0 0 0 24px rgba(244, 197, 66, 0.08);
+      }
+    }
+
+    @keyframes morphMango {
+      0%,
+      100% {
+        border-radius: 48% 52% 45% 55%;
+        transform: translate(-50%, -50%) rotate(-6deg) scale(1);
+      }
+      25% {
+        border-radius: 54% 46% 58% 42%;
+        transform: translate(-50%, -50%) rotate(2deg) scale(1.03);
+      }
+      50% {
+        border-radius: 42% 58% 40% 60%;
+        transform: translate(-50%, -50%) rotate(7deg) scale(1.05);
+      }
+      75% {
+        border-radius: 52% 48% 62% 38%;
+        transform: translate(-50%, -50%) rotate(-2deg) scale(0.98);
+      }
+    }
+
+    @keyframes ringPulse {
+      0% {
+        opacity: 0;
+        transform: scale(0.76);
+      }
+      20% {
+        opacity: 0.6;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.22);
+      }
+    }
+
+    @keyframes scanSweep {
+      0% {
+        top: 16%;
+        opacity: 0;
+      }
+      12% {
+        opacity: 1;
+      }
+      52% {
+        top: 54%;
+        opacity: 1;
+      }
+      100% {
+        top: 80%;
+        opacity: 0;
+      }
+    }
+
+    @keyframes conveyorRun {
+      to {
+        background-position: 0 0, -180px 0;
+      }
+    }
+
+    @keyframes metricSweep {
+      0% {
+        left: -100%;
+      }
+      100% {
+        left: 100%;
+      }
+    }
+
+    @keyframes screenSweep {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes beamSweep {
+      0%,
+      100% {
+        transform: translateX(-16%) scaleX(0.72);
+        opacity: 0.52;
+      }
+      50% {
+        transform: translateX(16%) scaleX(1.04);
+        opacity: 1;
+      }
+    }
+
+    @keyframes mangoTravel {
+      0% {
+        transform: translateX(0) scale(0.9);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(clamp(320px, 56vw, 560px)) scale(0.88);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 1040px) {
+      .hero-inner,
+      .demo-layout,
+      .contact-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .machine-preview {
+        min-height: 420px;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .scale-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .demo-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: 280px 190px;
+      }
+
+      .demo-shot-main {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        min-height: 280px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .nav-inner {
+        min-height: 68px;
+      }
+
+      .brand-mark {
+        width: 48px;
+        height: 48px;
+      }
+
+      .brand-copy {
+        max-width: 170px;
+      }
+
+      .brand-copy strong {
+        line-height: 1.15;
+      }
+
+      .brand-copy small {
+        display: none;
+      }
+
+      .nav-actions .button-outline {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-inner {
+        padding: 54px 0 68px;
+        gap: 32px;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.35rem, 13vw, 3.55rem);
+      }
+
+      .hero-stats,
+      .preview-metrics,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .machine-preview {
+        min-height: 360px;
+        padding: 18px;
+      }
+
+      .status-tag {
+        font-size: 0.7rem;
+        padding: 8px 10px;
+      }
+
+      .status-tag-right {
+        top: 70px;
+        right: 12px;
+      }
+
+      .preview-logo-card {
+        width: 118px;
+        right: 12px;
+        bottom: 12px;
+      }
+
+      .preview-label {
+        left: 12px;
+        bottom: 12px;
+        font-size: 0.74rem;
+      }
+
+      .demo-placeholder {
+        padding: 18px;
+      }
+
+      .demo-gallery-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 210px);
+      }
+
+      .demo-shot,
+      .demo-shot-main {
+        min-height: 210px;
+      }
+
+      .demo-shot-main {
+        grid-column: auto;
+        grid-row: auto;
+      }
+
+      .demo-shot-caption {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        padding: 10px 12px;
+      }
+
+      section {
+        padding: 62px 0;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .workflow-item {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="#top" aria-label="Smart Mango Sorting System home">
+          <span class="brand-mark">
+            <img class="brand-logo" src="MangosenseLOGO.jpg" alt="MangoSense AI logo">
+          </span>
+          <span class="brand-copy">
+            <strong>Smart Mango Sorting System</strong>
+            <small>Powered by MangoSense AI</small>
+          </span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#demo">Demo</a>
+          <a href="#scalable">Solutions</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a class="button button-outline" href="#demo">View Demo</a>
+          <a class="button button-primary" href="#contact">Get Started</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-inner">
+          <div>
+            <div class="eyebrow"><span class="signal-dot"></span> AI Mango Grading Automation</div>
+            <h1 id="hero-title">Smart Mango Sorting System</h1>
+            <p class="hero-copy">
+              An automated mango grading and sorting machine using conveyor control,
+              sensor readings, and AI detection for accurate, fast, and consistent
+              quality sorting.
+            </p>
+
+            <div class="hero-cta" aria-label="Primary actions">
+              <a class="button button-secondary" href="#demo">View Demo</a>
+              <a class="button button-outline" href="#features">Learn More</a>
+              <a class="button button-primary" href="#contact">Contact Us</a>
+            </div>
+
+            <div class="hero-stats" aria-label="System highlights">
+              <div class="stat">
+                <strong>AI</strong>
+                <span>Quality detection</span>
+              </div>
+              <div class="stat">
+                <strong>Fast</strong>
+                <span>Conveyor sorting</span>
+              </div>
+              <div class="stat">
+                <strong>Scalable</strong>
+                <span>Farm to business use</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="machine-preview" aria-label="Animated machine preview">
+            <div class="preview-screen">
+              <img class="preview-machine-image" src="ChatGPT Image Apr 24, 2026, 01_48_29 AM.png" alt="Rendered concept image of the Smart Mango Sorting System">
+              <div class="scan-grid" aria-hidden="true"></div>
+              <div class="preview-focus" aria-hidden="true"></div>
+              <div class="status-tag status-tag-left">Conveyor Flow</div>
+              <div class="status-tag status-tag-right">AI Chamber</div>
+              <div class="scan-line"></div>
+              <div class="preview-logo-card">
+                <img src="MangosenseLOGO.jpg" alt="MangoSense AI logo">
+                <span>MangoSense AI</span>
+              </div>
+              <div class="preview-label">Animated machine concept view</div>
+            </div>
+            <div class="preview-metrics">
+              <div class="metric">
+                <span>Size</span>
+                <strong>Detected</strong>
+              </div>
+              <div class="metric">
+                <span>Color</span>
+                <strong>Graded</strong>
+              </div>
+              <div class="metric">
+                <span>Defects</span>
+                <strong>Flagged</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features" id="features" aria-labelledby="features-title">
+        <div class="section-inner">
+          <div class="section-heading">
+            <span class="section-label">Key Features</span>
+            <h2 id="features-title">Built for faster, more reliable mango grading.</h2>
+            <p>
+              The system helps farms and produce businesses reduce manual checking,
+              minimize human error, and keep every batch sorted with consistent standards.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div>
+                <div class="feature-icon">01</div>
+                <h3>Quality Detection</h3>
+                <p>Detects mango size, color, and visible defects through sensor and AI analysis.</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <div>
+                <div class="feature-icon">02</div>
+                <h3>Less Manual Labor</h3>
+                <p>Reduces repetitive checking tasks while helping avoid inconsistent human grading.</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <div>
+                <div class="feature-icon">03</div>
+                <h3>Fast Conveyor Sorting</h3>
+                <p>Moves mangoes through an automated conveyor process for quick sorting decisions.</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <div>
+                <div class="feature-icon">04</div>
+                <h3>Consistent Grading</h3>
+                <p>Improves product quality control by applying the same grading logic to every mango.</p>
+              </div>
+            </article>
+
+            <article class="feature-card">
+              <div>
+                <div class="feature-icon">05</div>
+                <h3>Business Ready</h3>
+                <p>Scales from small farms to larger produce operations that need dependable throughput.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo" id="demo" aria-labelledby="demo-title">
+        <div class="section-inner">
+          <div class="section-heading">
+            <span class="section-label">View Demo</span>
+            <h2 id="demo-title">A clean automated flow from scan to sorted output.</h2>
+            <p>
+              The gallery below is set up for three machine screenshots so viewers can
+              understand the conveyor path, sorting exit, and full system layout.
+            </p>
+          </div>
+
+          <div class="demo-layout">
+            <div class="demo-placeholder">
+              <div class="demo-gallery-grid" aria-label="Machine design gallery">
+                <figure class="demo-shot demo-shot-main">
+                  <img data-src="UPDATED1.png" alt="Side layout view of the Smart Mango Sorting System" loading="lazy">
+                  <div class="demo-shot-fallback">
+                    <span>System View</span>
+                    <strong>Side Layout</strong>
+                    <p>Conveyor feed, AI scan chamber, and output trays.</p>
+                  </div>
+                  <figcaption class="demo-shot-caption">
+                    <strong>Side Layout View</strong>
+                    <span>Shows the full machine path from intake to sorted output.</span>
+                  </figcaption>
+                </figure>
+
+                <figure class="demo-shot">
+                  <img data-src="UPDATED2.png" alt="Reverse angle view of the Smart Mango Sorting System" loading="lazy">
+                  <div class="demo-shot-fallback">
+                    <span>System View</span>
+                    <strong>Rear Conveyor Angle</strong>
+                    <p>Highlights the inclined feed conveyor and central chamber.</p>
+                  </div>
+                  <figcaption class="demo-shot-caption">
+                    <strong>Rear Conveyor Angle</strong>
+                    <span>Focuses on the approach into the inspection and sorting unit.</span>
+                  </figcaption>
+                </figure>
+
+                <figure class="demo-shot">
+                  <img data-src="UPDATED3.png" alt="Top view of the Smart Mango Sorting System" loading="lazy">
+                  <div class="demo-shot-fallback">
+                    <span>System View</span>
+                    <strong>Top Overview</strong>
+                    <p>Displays mango spacing, lane alignment, and tray direction.</p>
+                  </div>
+                  <figcaption class="demo-shot-caption">
+                    <strong>Top Overview</strong>
+                    <span>Useful for explaining spacing, routing, and tray organization.</span>
+                  </figcaption>
+                </figure>
+              </div>
+              <div class="demo-gallery-note" aria-hidden="true">
+                <span>Layout View</span>
+                <span>Sorting Exit</span>
+                <span>Top Overview</span>
+              </div>
+              <div class="demo-copy-block">
+                <h3>Machine design gallery</h3>
+                <p>These views help explain how mangoes move through the conveyor, pass the AI detection zone, and exit into organized trays.</p>
+              </div>
+            </div>
+
+            <div class="workflow" aria-label="Sorting process">
+              <article class="workflow-item">
+                <div class="workflow-number">1</div>
+                <div>
+                  <h3>Load mangoes onto the conveyor</h3>
+                  <p>The system feeds mangoes into a steady inspection path.</p>
+                </div>
+              </article>
+
+              <article class="workflow-item">
+                <div class="workflow-number">2</div>
+                <div>
+                  <h3>Scan size, color, and defects</h3>
+                  <p>Sensors and AI detection review each mango for grading signals.</p>
+                </div>
+              </article>
+
+              <article class="workflow-item">
+                <div class="workflow-number">3</div>
+                <div>
+                  <h3>Sort by quality category</h3>
+                  <p>The machine directs mangoes to the proper output lane for faster packing.</p>
+                </div>
+              </article>
+
+              <article class="workflow-item">
+                <div class="workflow-number">4</div>
+                <div>
+                  <h3>Improve batch consistency</h3>
+                  <p>Each batch follows the same grading process for better quality control.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="scalable" id="scalable" aria-labelledby="scalable-title">
+        <div class="section-inner">
+          <div class="section-heading">
+            <span class="section-label">Scalable Solutions</span>
+            <h2 id="scalable-title">Designed for farms, suppliers, and growing produce businesses.</h2>
+            <p>
+              Smart Mango Sorting System supports better throughput and more predictable quality,
+              whether you are improving a small operation or preparing for larger distribution.
+            </p>
+          </div>
+
+          <div class="scale-grid">
+            <article class="scale-panel">
+              <strong>01</strong>
+              <h3>Farm Operations</h3>
+              <p>Speed up post-harvest sorting and help workers focus on higher-value tasks.</p>
+            </article>
+
+            <article class="scale-panel">
+              <strong>02</strong>
+              <h3>Quality Control</h3>
+              <p>Create more consistent grading decisions before packing and delivery.</p>
+            </article>
+
+            <article class="scale-panel">
+              <strong>03</strong>
+              <h3>Business Growth</h3>
+              <p>Support higher mango volume with an automated process that can scale with demand.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-title">
+        <div class="section-inner contact-layout">
+          <div>
+            <div class="section-heading">
+              <span class="section-label">Contact Us</span>
+              <h2 id="contact-title">Ready to get started?</h2>
+              <p>
+                Reach out to learn more, request a demo, or discuss how the system can fit
+                your mango sorting workflow.
+              </p>
+            </div>
+
+            <div class="contact-list">
+              <div class="contact-row">
+                <span>Email</span>
+                <a href="mailto:smartmangosystem@gmail.com">smartmangosystem@gmail.com</a>
+              </div>
+              <div class="contact-row">
+                <span>Phone</span>
+                <a href="tel:+639817000557">+63 981 700 0557</a>
+              </div>
+              <div class="contact-row">
+                <span>Address</span>
+                <strong>Philippines</strong>
+              </div>
+              <div class="contact-row">
+                <span>Facebook</span>
+                <a href="https://fb.com/smartmangosystem" target="_blank" rel="noopener">fb.com/smartmangosystem</a>
+              </div>
+            </div>
+          </div>
+
+          <form class="form-card" id="contact-form">
+            <h3>Get Started</h3>
+            <div class="form-grid">
+              <label>
+                Name
+                <input type="text" name="name" placeholder="Your name" required>
+              </label>
+
+              <label>
+                Email
+                <input type="email" name="email" placeholder="you@example.com" required>
+              </label>
+
+              <label>
+                Interest
+                <select name="interest" required>
+                  <option value="">Select an option</option>
+                  <option>View Demo</option>
+                  <option>Learn More</option>
+                  <option>Contact Us</option>
+                  <option>Get Started</option>
+                </select>
+              </label>
+
+              <label>
+                Message
+                <textarea name="message" placeholder="Tell us about your mango sorting needs"></textarea>
+              </label>
+
+              <button class="button button-primary" type="submit">Send Inquiry</button>
+            </div>
+            <p class="form-note" id="form-note">This demo form shows a confirmation message only.</p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <p>Copyright 2026 Smart Mango Sorting System. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#features">Learn More</a>
+          <a href="#demo">View Demo</a>
+          <a href="#contact">Contact Us</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.querySelector("#contact-form");
+    const note = document.querySelector("#form-note");
+    const demoShotImages = document.querySelectorAll(".demo-shot img[data-src], .demo-shot img[data-base]");
+    const revealTargets = document.querySelectorAll(
+      ".machine-preview, .stat, .feature-card, .demo-placeholder, .workflow-item, .scale-panel, .contact-row, .form-card"
+    );
+
+    function loadDemoShot(img) {
+      const card = img.closest(".demo-shot");
+      const directSrc = img.dataset.src;
+
+      if (directSrc) {
+        const probe = new Image();
+
+        probe.onload = function () {
+          img.src = directSrc;
+          card.classList.add("is-loaded");
+        };
+
+        probe.onerror = function () {
+          card.classList.add("is-missing");
+        };
+
+        probe.src = directSrc;
+        return;
+      }
+
+      const base = img.dataset.base;
+      const extensions = ["png", "jpg", "jpeg", "webp"];
+      let index = 0;
+
+      function tryNext() {
+        if (index >= extensions.length) {
+          card.classList.add("is-missing");
+          return;
+        }
+
+        const candidate = base + "." + extensions[index];
+        const probe = new Image();
+        index += 1;
+
+        probe.onload = function () {
+          img.src = candidate;
+          card.classList.add("is-loaded");
+        };
+
+        probe.onerror = tryNext;
+        probe.src = candidate;
+      }
+
+      tryNext();
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      note.textContent = "Thank you. Your inquiry has been prepared for the Smart Mango Sorting System team.";
+      form.reset();
+    });
+
+    demoShotImages.forEach(function (img) {
+      loadDemoShot(img);
+    });
+
+    revealTargets.forEach(function (target) {
+      target.classList.add("reveal");
+    });
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.18
+        }
+      );
+
+      revealTargets.forEach(function (target) {
+        observer.observe(target);
+      });
+    } else {
+      revealTargets.forEach(function (target) {
+        target.classList.add("is-visible");
+      });
+    }
+  </script>
+</body>
+</html>
